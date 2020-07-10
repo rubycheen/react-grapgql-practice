@@ -23,7 +23,7 @@ const GET_ISSUES_OF_REPOSITORY = `
       repository(name: $repository) {
         name
         url
-        issues(last: 20, after: $cursor, states: [OPEN]) {
+        issues(first: 5, after: $cursor, states: [OPEN]) {
           edges {
             node {
               id
@@ -51,7 +51,7 @@ const GET_ISSUES_OF_REPOSITORY = `
 `;
 const getIssuesOfRepository = (path, cursor) => {
   const [organization, repository] = path.split('/');
-
+  console.log(organization, repository, cursor)
   return axiosGitHubGraphQL.post('',{
     query: GET_ISSUES_OF_REPOSITORY,
     variables: {organization, repository, cursor},
@@ -117,6 +117,7 @@ class App extends Component {
   onFetchMoreIssues = () => {
     const {
       endCursor,
+      path
     } = this.state.organization.repository.issues.pageInfo;
 
     this.onFetchFromGitHub(this.state.path, endCursor);
@@ -126,8 +127,8 @@ class App extends Component {
 
   render() {
     const { path, organization, errors } = this.state;
-    console.log("state",this.state)
-    console.log("path",this.state.path)
+    // console.log("state",this.state)
+    // console.log("path",this.state.path)
 
     return (
       <div>
@@ -151,7 +152,7 @@ class App extends Component {
           <Organization 
           organization={organization} 
           errors={errors}
-          onFetchMoreIssues={this.onFetchFromGitHub}
+          onFetchMoreIssues={this.onFetchMoreIssues}
           />
         ) : (
           <p>No information yet ...</p>
